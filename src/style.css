@@ -1,0 +1,25 @@
+/*
+  3. Allow percentage-based heights in the application
+*/
+html, body {
+	height: 100%;
+	background-color: #d9d9d9;
+  }
+  /*
+	Typographic tweaks!
+	4. Add accessible line-height
+	5. Improve text rendering
+  */
+  body {
+	line-height: 1.5;
+	-webkit-font-smoothing: antialiased;
+  }
+
+  button {
+	outline: none;
+    background-color: unset;
+    box-shadow: none;
+    border: unset;
+    color: unset;
+	padding: 0;
+  }
