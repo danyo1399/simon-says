@@ -12,7 +12,7 @@
 			"type": "image/png"
 		},
 		{
-			"src": "/simon-says/assets/game-logo-full.png",
+			"src": "/simon-says/assets/game-logo-full-masked.png",
 			"sizes": "512x512",
 			"type": "image/png",
 			"purpose": "maskable"
