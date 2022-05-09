@@ -7,12 +7,12 @@
 	"start_url": "https://danyo1399.github.io/simon-says/",
 	"icons": [
 		{
-			"src": "/assets/app-icon.png",
+			"src": "/assets/game-logo-full.png",
 			"sizes": "512x512",
 			"type": "image/png"
 		},
 		{
-			"src": "/assets/app-icon-maskable.png",
+			"src": "/assets/game-logo-full.png",
 			"sizes": "512x512",
 			"type": "image/png",
 			"purpose": "maskable"
