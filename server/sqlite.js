@@ -12,6 +12,7 @@ const dbFile = "./.data/choices.db";
 const exists = fs.existsSync(dbFile);
 const sqlite3 = require("sqlite3").verbose();
 const dbWrapper = require("sqlite");
+const { constants } = require('./constants');
 let db;
 
 /* 
@@ -26,16 +27,14 @@ dbWrapper
   .then(async (dBase) => {
     db = dBase; 
 
-    // We use try and catch blocks throughout to handle any database errors
     try {
-      // The async / await syntax lets us write the db operations in a way that won't block the app
+
       if (!exists) {
-        // Database doesn't exist yet - create Choices and Log tables
+
         await db.run(
           "CREATE TABLE teams (id text PRIMARY KEY, name text, description text, secret text)"
         );
 
-        // Log can start empty - we'll insert a new record whenever the user chooses a poll option
         await db.run(
           `
           CREATE TABLE players (
@@ -64,7 +63,7 @@ dbWrapper
         `);
       } else {
         // db exists
-        await db.run(`delete from players where highScore <= 4`)
+        await db.run(`delete from players where highScore <= 4 || highScore > ${constants.maxScore}`)
         await db.run(`
         delete from playerNames
         where not exists(select 1 from players p where p.id = playerId)
@@ -95,7 +94,6 @@ module.exports = {
     try {
       return await db.get("SELECT * from players where id = ?", playerId);
     } catch (dbError) {
-      // Database connection error
       console.error(dbError);
       throw dbError;
     }
