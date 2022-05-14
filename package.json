@@ -1,6 +1,6 @@
 {
   "name": "@danyo1399/simon-says",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "description": "",
   "source": "src/index.js",
   "main": "dist/index.js",
