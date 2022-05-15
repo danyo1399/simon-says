@@ -23,7 +23,6 @@ export function usePlayerList(showAll) {
   const [myRank, setMyRank] = useState();
 
   useEffect(() => {
-    console.log('lol show all', showAll)
     async function loadPlayersAsync() {
       const players = await getLeaderboardAsync(showAll);
 
