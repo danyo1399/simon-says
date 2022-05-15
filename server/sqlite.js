@@ -63,7 +63,7 @@ dbWrapper
         `);
       } else {
         // db exists
-        await db.run(`delete from players where highScore <= 4 || highScore > ${constants.maxScore}`)
+        await db.run(`delete from players where highScore <= 4 or highScore > ${constants.maxScore}`)
         await db.run(`
         delete from playerNames
         where not exists(select 1 from players p where p.id = playerId)
