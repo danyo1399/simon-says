@@ -62,7 +62,8 @@ export function TopBar({ player, shake }) {
   const [_shake, _setShake] = useState(false);
   useEffect(() => {
     let exit = false;
-    async function run() {
+    async function startShaking() {
+      await sleep(2000)
       while (!exit) {
         await sleep(2000);
         if (exit) return;
@@ -73,7 +74,7 @@ export function TopBar({ player, shake }) {
         _setShake(false);
       }
     }
-    shake && run();
+    shake && startShaking();
     return () => {
       exit = true;
       _setShake(false);
