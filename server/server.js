@@ -2,7 +2,10 @@
 const fastify = require("fastify")({
   // Set this to true for detailed logging:
   logger: false,
+  trustProxy: true 
 });
+
+const md5 = require('md5');
 
 fastify.register(require("@fastify/cors"), {
   // put your options here
@@ -19,6 +22,11 @@ if (seo.url === "glitch-default") {
 
 const { constants } = require('./constants');
 const db = require("./sqlite.js");
+
+function verifyKey(value, key) {
+  let result = md5(`${value}|${key}`);
+  return result.endsWith("00000");
+}
 
 // create team
 fastify.post("/teams", async (request, reply) => {
@@ -79,6 +87,7 @@ fastify.get("/teams/:id/players", async (request, reply) => {
   reply.send(limitedPlayers);
 });
 
+// create player
 fastify.post("/teams/:teamId/players", async (request, reply) => {
   let teamId = request.params.teamId;
   let player = request.body;
@@ -89,16 +98,23 @@ fastify.post("/teams/:teamId/players", async (request, reply) => {
     !player.name ||
     !player.teamId ||
     player.name.length > 20 ||
-    typeof player.highScore !== "number"
+    typeof player.highScore !== "number" || 
+    !player.key
   ) {
     return reply.status(400).send({});
   }
+  const isValidKey = verifyKey(player.id, player.key);
+  if(!isValidKey) {
+    return reply.status(400).send({reason: 'invalid key'});
+  }
+
   player.teamId = teamId;
   await db.createPlayer(player);
 
   reply.send({});
 });
 
+// get player
 fastify.get("/teams/:teamId/players/:playerId", async (request, reply) => {
   let teamId = request.params.teamId;
   let playerId = request.params.playerId;
@@ -112,6 +128,7 @@ fastify.get("/teams/:teamId/players/:playerId", async (request, reply) => {
   reply.send(player);
 });
 
+// set player name
 fastify.post(
   "/teams/:teamId/players/:playerId/set-name",
   async (request, reply) => {
@@ -128,6 +145,7 @@ fastify.post(
   }
 );
 
+// delete player
 fastify.delete("/teams/:teamId/players/:playerId", async (request, reply) => {
   let auth = getAuth(request);
   if (auth !== process.env.ADMIN_KEY) return reply.status(401).send({});
@@ -143,6 +161,7 @@ fastify.delete("/teams/:teamId/players/:playerId", async (request, reply) => {
   reply.send({});
 });
 
+// set player high score
 fastify.post(
   "/teams/:teamId/players/:playerId/set-high-score",
   async (request, reply) => {

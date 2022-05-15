@@ -1,3 +1,5 @@
+import md5 from 'md5';
+
 export function sleep(ms) {
   let id;
   const promise =  new Promise((resolve) => {
@@ -82,5 +84,4 @@ export function throttle(fn, timeMs) {
     }, timeMs);
   };
 }
-
 

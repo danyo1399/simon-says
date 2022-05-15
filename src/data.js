@@ -1,6 +1,7 @@
 import { nextId } from "./utils";
 import * as forage from "localforage";
 import { dispatchEvent, events } from "./events";
+import { workerActions } from './workerClient';
 
 const DEFAULT_TEAM_ID = "1nn2iuopnpd20x72be08zt";
 const apiBaseUrl = "https://simon-says-api.glitch.me";
@@ -92,11 +93,13 @@ const leaderboard = {
 
 const api = {
   async createPlayerAsync({ id, teamId, name, highScore }) {
+    const key = await workerActions.generateKeyAsync(id);
     await fetchJsonAsync("POST", `${apiBaseUrl}/teams/${teamId}/players`, {
       id,
       teamId,
       name,
       highScore,
+      key
     });
   },
   async getPlayerAsync(id = me.getPlayerId()) {
@@ -155,7 +158,7 @@ function setItem(key, item) {
 
 // START UP
 // --------------------------------------------------------------------------
-export const initPromise = (async function main() {
+const initPromise = (async function main() {
   try {
     await loadMyPlayerAsync();
   } catch (err) {
@@ -175,6 +178,10 @@ export const initPromise = (async function main() {
   await loadLeaderboardAsync();
 })();
 initPromise.finally(() => dispatchEvent(events.loaded));
+
+export function onLoad(callback) {
+  initPromise.then(callback)
+}
 
 // EXPORTS
 // -----------------------------------------------------
