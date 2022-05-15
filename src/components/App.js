@@ -137,7 +137,7 @@ function Loading() {
   return (
     <div class={styles}>
       <div class="content">
-      <div class=" spinner spinner-border" role="status"></div>
+      <div class=" spinner spinner-border" role="status" />
       <span>Loading</span>
       </div>
     </div>

@@ -176,11 +176,13 @@ const initPromise = (async function main() {
     }
   }
   await loadLeaderboardAsync();
-})();
+})().catch(err => {
+  console.error('Main startup failed', err);
+});
 initPromise.finally(() => dispatchEvent(events.loaded));
 
 export function onLoad(callback) {
-  initPromise.then(callback)
+  initPromise.finally(callback)
 }
 
 // EXPORTS
