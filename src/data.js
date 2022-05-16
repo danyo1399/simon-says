@@ -22,10 +22,21 @@ const me = {
   setPlayerId(playerId) {
     setItem(userIdKey, playerId);
   },
-  setPlayer({ name, highScore }) {
-    const key = this.getPlayerKey();
-    const player = { id: this.getPlayerId(), name, highScore };
-    setItem(key, player);
+  setNameAndHighScore({ name, highScore }) {
+    const player = this.getPlayer();
+    player.name = name;
+    player.highScore = highScore;
+
+    this.updatePlayer(player);
+  },
+  setSaved() {
+    const player = this.getPlayer();
+    player.isSaved = true;
+    this.updatePlayer(player);
+  },
+  isSaved() {
+    const player = this.getPlayer();
+    return player.isSaved;
   },
   getPlayer() {
     const key = this.getPlayerKey();
@@ -35,6 +46,7 @@ const me = {
         id: this.getPlayerId(),
         name: `user${Date.now()}`,
         highScore: 0,
+        isSaved:false
       };
       setItem(key, player);
     }
@@ -159,23 +171,31 @@ function setItem(key, item) {
 // START UP
 // --------------------------------------------------------------------------
 const initPromise = (async function main() {
-  try {
-    await loadMyPlayerAsync();
-  } catch (err) {
-    if (err.status === 404) {
-      const player = me.getPlayer();
-      console.log("player does not exist");
-      await api.createPlayerAsync({
-        id: me.getPlayerId(),
-        teamId,
-        name: player.name,
-        highScore: player.highScore,
-      });
+  async function setup() {
+    try {
 
-      dispatchEvent(events.newUserCreated);
+      await loadMyPlayerAsync();
+      me.setSaved()
+    } catch (err) {
+      if (err.status === 404) {
+        const player = me.getPlayer();
+        console.log("player does not exist");
+        await api.createPlayerAsync({
+          id: me.getPlayerId(),
+          teamId,
+          name: player.name,
+          highScore: player.highScore,
+        });
+        me.setSaved();
+        dispatchEvent(events.newUserCreated);
+      }
     }
+    await loadLeaderboardAsync();
   }
-  await loadLeaderboardAsync();
+  const setupPromise = setup();
+  if(!me.isSaved()) {
+    await setupPromise;
+  }
 })().catch(err => {
   console.error('Main startup failed', err);
 });
@@ -226,7 +246,7 @@ export async function refreshAsync() {
 export async function changePlayerIdAsync(playerId) {
   const remotePlayer = await api.getPlayerAsync(playerId);
   me.setPlayerId(playerId);
-  me.setPlayer(remotePlayer);
+  me.setNameAndHighScore(remotePlayer);
   dispatchEvent(events.playerUpdated);
 }
 
