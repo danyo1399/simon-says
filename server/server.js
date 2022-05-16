@@ -78,11 +78,16 @@ fastify.get("/teams/:id/players", async (request, reply) => {
   if (auth === process.env.ADMIN_KEY) {
     return reply.send(players);
   }
-  const limitedPlayers = players.map(({ highScore, id, name }) => ({
+  const limitedPlayers = players
+  .filter(x => x.id === auth || ( // show banned players on banned players leaderboard but nobody else
+    process.env.BANNED_PLAYERS.includes(x.id) === false &&
+    x.highScore < constants.maxScore
+  ))
+  .map(({ highScore, id, name }) => ({
     highScore,
     name,
     me: id === auth,
-  })).filter(x => x.me || x.highScore < constants.maxScore);
+  }));
 
   reply.send(limitedPlayers);
 });
